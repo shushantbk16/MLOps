@@ -1,0 +1,27 @@
+name: ML Pipeline CI
+
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          
+      - name: Train Model (Simulation)
+        run: python src/train.py
+        
+      - name: Test API Startup
+        run: |
+          nohup uvicorn src.app:app --host 0.0.0.0 --port 8000 &
+          sleep 5
+          curl [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
